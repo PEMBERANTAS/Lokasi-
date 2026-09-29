@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bagikan Lokasi Saya</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:520px;margin:40px auto;padding:20px;line-height:1.5}
+button{width:100%;padding:14px;margin:8px 0;font-size:16px;cursor:pointer}
+#hasil{margin-top:20px;padding:15px;background:#f2f2f2;border-radius:10px;word-break:break-word}
+a{display:block;margin-top:12px}
+.muted{color:#666;font-size:14px}
+</style>
+</head>
+<body>
+<h2>📍 Bagikan Lokasi Saya</h2>
+<p>Halaman ini hanya mengambil lokasi setelah Anda menekan tombol dan memberikan izin lokasi kepada browser.</p>
+<button onclick="ambilLokasi()">Izinkan & Tampilkan Lokasi</button>
+<div id="hasil">Lokasi belum diambil.</div>
+
+<script>
+function ambilLokasi(){
+  const hasil = document.getElementById('hasil');
+
+  if (!navigator.geolocation) {
+    hasil.innerHTML = "Browser ini tidak mendukung geolocation.";
+    return;
+  }
+
+  hasil.innerHTML = "Meminta izin lokasi...";
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+      const akurasi = Math.round(pos.coords.accuracy);
+
+      const maps = "https://www.google.com/maps?q=" + lat + "," + lon;
+
+      hasil.innerHTML =
+        "<b>Lokasi berhasil diperoleh.</b><br><br>" +
+        "Latitude: " + lat + "<br>" +
+        "Longitude: " + lon + "<br>" +
+        "Perkiraan akurasi: " + akurasi + " meter" +
+        '<a href="' + maps + '" target="_blank" rel="noopener">🗺️ Buka di Google Maps</a>' +
+        "<p class='muted'>Koordinat ini ditampilkan di perangkat dan tidak dikirim ke server oleh halaman ini.</p>";
+    },
+    function(err){
+      const pesan = {
+        1: "Izin lokasi ditolak.",
+        2: "Lokasi tidak tersedia.",
+        3: "Permintaan lokasi terlalu lama."
+      };
+      hasil.innerHTML = "Gagal mengambil lokasi: " + (pesan[err.code] || err.message);
+    },
+    {enableHighAccuracy:true, timeout:15000, maximumAge:0}
+  );
+}
+</script>
+</body>
+</html>
